@@ -46,6 +46,13 @@ A beautiful, customizable start page that replaces your new tab with organized b
 - Press `Ctrl+F` to quickly focus the search
 - Press `Escape` to clear search
 
+## Keyboard Shortcuts
+
+- **Ctrl/Cmd + F**: Focus search bar
+- **Escape**: Clear search (when search is focused)
+- **Tab**: Navigate through all interactive elements
+- **Enter/Space**: Activate buttons and links
+
 ## Technical Details
 
 ### Storage
@@ -57,96 +64,22 @@ A beautiful, customizable start page that replaces your new tab with organized b
 - **storage**: Required to save bookmarks and settings
 - **chrome_url_overrides**: Required to replace new tab page
 
+### Content Security Policy
+- Implements strict CSP for enhanced security
+- All scripts are loaded from extension's origin
+- No inline scripts allowed
+
 ### Files
-- `manifest.json`: Extension configuration
+- `manifest.json`: Extension configuration and CSP settings
 - `start.html`: Main start page interface
-- `background.js`: Service worker for extension lifecycle
+- `script.js`: All JavaScript functionality
 - `icons/`: Extension icons for Chrome interface
-
-## Customization
-
-### Changing Extension Name
-Edit the `name` field in `manifest.json`:
-```json
-{
-  "name": "Your Custom Name",
-  "description": "Your custom description"
-}
-```
-
-### Adding Icons
-Replace the files in the `icons/` folder:
-- `icon16.png`: 16×16 pixels (toolbar)
-- `icon48.png`: 48×48 pixels (extension page)
-- `icon128.png`: 128×128 pixels (Chrome Web Store)
-
-## Development
-
-### Local Testing
-1. Make changes to any file
-2. Go to `chrome://extensions/`
-3. Click the refresh icon on your extension
-4. Open a new tab to test changes
-
-### Debugging
-- Right-click on new tab → "Inspect" to open DevTools
-- Check Console for any JavaScript errors
-- Verify manifest.json syntax with online validators
-
-## Keyboard Shortcuts
-
-- **Ctrl/Cmd + F**: Focus search bar
-- **Escape**: Clear search (when search is focused)
-- **Tab**: Navigate through all interactive elements
-- **Enter/Space**: Activate buttons and links
-
-## Privacy & Security
-
-- **Local Storage Only**: All data stays on your device
-- **No External Servers**: No data sent anywhere
-- **Secure Links**: External links open with security headers
-- **Content Security Policy**: Prevents malicious script injection
-
-## Version History
-
-### v1.0.0
-- Initial release
-- Bookmark management with categories
-- 5 built-in themes with customization
-- Search and filter functionality
-- Drag & drop reordering
-- Full accessibility support
-- Chrome extension integration
-
-## Troubleshooting
-
-### Extension Not Loading
-- Check that all files are in the correct locations
-- Verify `manifest.json` has valid JSON syntax
-- Ensure Developer Mode is enabled
-- Try restarting Chrome
-
-### Data Not Saving
-- Check browser console for error messages
-- Verify extension has storage permissions
-- Try reloading the extension
-
-### New Tab Not Showing
-- Check for conflicting new-tab extensions
-- Refresh the extension and restart Chrome
-- Verify `chrome_url_overrides` in manifest
-
-## Support
-
-For issues or feature requests:
-1. Check the troubleshooting section above
-2. Look for error messages in browser console (F12)
-3. Visit [Mirabelle's website](https://mirabelledoiron.com/) for updates
+  - `icon16.png`: 16×16 pixels (toolbar)
+  - `icon48.png`: 48×48 pixels (extension page)
+  - `icon128.png`: 128×128 pixels (Chrome Web Store)
 
 ## License
 
 Created by [Mirabelle Doiron](https://mirabelledoiron.com/) - Feel free to customize for personal use.
-
----
 
 **Enjoy your beautiful, organized start page!**

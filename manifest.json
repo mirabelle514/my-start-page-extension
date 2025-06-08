@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "My Start Page",
-    "version": "1.0.0",
-    "description": "A customizable start page with bookmark management, theme selection, and search functionality. Created by Mirabelle Doiron.",
+    "version": "1.0",
+    "description": "A beautiful, customizable start page that replaces your new tab with organized bookmarks, themes, and search functionality.",
     "chrome_url_overrides": {
         "newtab": "start.html"
     },
