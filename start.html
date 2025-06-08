@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Start Page with Theme Swatches</title>
+  <style>
+    :root {
+      --primary: #0D1B2A;
+      --secondary: #1B263B;
+      --accent: #E0A458;
+      --background: #F4F4F4;
+      --text: #0D1B2A;
+
+      --font-family: Helvetica, sans-serif;
+
+      --page-bg: var(--primary);
+      --card-bg: var(--secondary);
+      --header-color: var(--accent);
+      --text-color: var(--text);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--page-bg);
+      color: var(--text-color);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: var(--header-color);
+    }
+
+    form {
+      max-width: 1000px;
+      margin: 0 auto 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    input, select, button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      width: 100%;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: var(--background);
+      cursor: pointer;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    #customCategory { display: none; }
+
+    .category-card {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      font-family: var(--font-family);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1000px;
+    }
+
+    .category-card h2 {
+      color: var(--header-color) !important;
+      text-align: center;
+    }
+
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .link-grid a {
+      display: block;
+      background: white;
+      padding: 12px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-color);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .link-grid a:hover {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .delete-link {
+      position: absolute;
+      top: 5px;
+      right: 8px;
+      background: #ff4444;
+      color: white;
+      border: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .edit-link {
+      position: absolute;
+      top: 5px;
+      right: 35px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      font-size: 10px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .link-grid a:hover .delete-link,
+    .link-grid a:hover .edit-link {
+      display: flex;
+    }
+
+    .delete-link:hover {
+      background: #cc0000;
+    }
+
+    .edit-link:hover {
+      background: #45a049;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .delete-category {
+      position: absolute;
+      right: 0;
+      background: #ff4444;
+      color: white;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .edit-category {
+      position: absolute;
+      right: 30px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .delete-category:hover {
+      background: #cc0000;
+    }
+
+    .edit-category:hover {
+      background: #45a049;
+    }
+
+    .edit-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .edit-modal-content {
+      background: var(--background);
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .edit-modal h3 {
+      color: var(--header-color);
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .edit-modal input, .edit-modal select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .edit-modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .edit-modal button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .save-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    .cancel-btn {
+      background: #6c757d;
+      color: white;
+    }
+
+    .theme-palette {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .theme-palette div {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .theme-selected {
+      font-weight: bold;
+      border: 2px solid var(--accent);
+    }
+
+    .color-dot-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+
+    .color-dot-group .dot-label {
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #595959 !important;
+    }
+
+    .dot-label {
+      color: #595959 !important;
+    }
+
+    #themeSelector {
+      color: #595959 !important;
+    }
+
+    #themeSelector > div {
+      color: #595959 !important;
+    }
+
+    .color-dot-group .dot-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sidebar {
+      width: 340px;
+      padding: 20px;
+      background: var(--background);
+      border-right: 1px solid #ccc;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .sidebar.collapsed {
+      width: 60px;
+      padding: 20px 10px;
+    }
+
+    .sidebar.collapsed > *:not(.toggle-btn) {
+      display: none !important;
+    }
+
+    .sidebar.collapsed h2 {
+      display: none !important;
+    }
+
+    .sidebar.collapsed label {
+      display: none !important;
+    }
+
+    .sidebar.collapsed select {
+      display: none !important;
+    }
+
+    .sidebar.collapsed button:not(.toggle-btn) {
+      display: none !important;
+    }
+
+    .sidebar.collapsed #themeSelector {
+      display: none !important;
+    }
+
+    .sidebar.collapsed .color-dot-group {
+      display: none !important;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 20px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .toggle-btn:hover {
+      opacity: 0.8;
+    }
+
+    .sidebar.collapsed .toggle-btn {
+      right: 15px;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+      form, .link-grid { grid-template-columns: 1fr; }
+      
+      .sidebar {
+        width: 280px;
+      }
+      
+      .sidebar.collapsed {
+        width: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div style="display: flex; min-height: 100vh;">
+    <aside id="sidebar" class="sidebar">
+      <button id="toggleSidebar" class="toggle-btn" title="Toggle Sidebar">‹</button>
+      
+      <h2>Select Theme</h2>
+      <div id="themeSelector" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+      <h2>Map Colors</h2>
+      <label class="dot-label">Page Background</label>
+      <select id="pageBgSelect"></select>
+
+      <label class="dot-label">Card Background</label>
+      <select id="cardBgSelect"></select>
+
+      <label class="dot-label">Header Color</label>
+      <select id="headerColorSelect"></select>
+
+      <label class="dot-label">Text Color</label>
+      <select id="textColorSelect"></select>
+
+      <button id="saveThemeBtn" style="margin-top: 20px;">Save Theme</button>
+    </aside>
+
+    <main class="main-content">
+      <h1>My Custom Start Page</h1>
+
+      <form id="linkForm">
+        <input type="text" id="linkTitle" placeholder="Title" required />
+        <input type="url" id="linkURL" placeholder="https://example.com" required />
+        <select id="categorySelect" required>
+          <option value="" disabled selected>Choose category</option>
+          <option value="__custom__">+ New category...</option>
+        </select>
+        <input type="text" id="customCategory" placeholder="Enter new category" />
+        <button type="submit">Add</button>
+      </form>
+
+      <div id="categoriesContainer"></div>
+    </main>
+  </div>
+
+  <script>
+    const themes = {
+      "Minimalist Neutral": {
+        "--primary": "#2E2E2E",
+        "--secondary": "#B0B0B0",
+        "--accent": "#FF6B6B",
+        "--background": "#FFFFFF",
+        "--text": "#1A1A1A"
+      },
+      "Elegant Midnight": {
+        "--primary": "#0D1B2A",
+        "--secondary": "#1B263B",
+        "--accent": "#E0A458",
+        "--background": "#F4F4F4",
+        "--text": "#0D1B2A"
+      },
+      "Soft Pastel": {
+        "--primary": "#A3D2CA",
+        "--secondary": "#F7D9D9",
+        "--accent": "#FFB085",
+        "--background": "#FFFFFF",
+        "--text": "#444444"
+      },
+      "Modern Tech": {
+        "--primary": "#0F4C81",
+        "--secondary": "#1B9AAA",
+        "--accent": "#F5A623",
+        "--background": "#F2F2F2",
+        "--text": "#222222"
+      },
+      "Earthy Organic": {
+        "--primary": "#6A994E",
+        "--secondary": "#A7C957",
+        "--accent": "#BC4749",
+        "--background": "#FDF0D5",
+        "--text": "#1B1B1E"
+      }
+    };
+
+    const mappings = {
+      "pageBgSelect": "--page-bg",
+      "cardBgSelect": "--card-bg",
+      "headerColorSelect": "--header-color",
+      "textColorSelect": "--text-color"
+    };
+
+    // Safe localStorage wrapper
+    const SafeStorage = {
+      setItem: (key, value) => {
+        try {
+          if (typeof(Storage) !== "undefined") {
+            localStorage.setItem(key, value);
+          }
+        } catch (e) {
+          console.warn('localStorage not available:', e);
+        }
+      },
+      getItem: (key) => {
+        try {
+          if (typeof(Storage) !== "undefined") {
+            return localStorage.getItem(key);
+          }
+        } catch (e) {
+          console.warn('localStorage not available:', e);
+        }
+        return null;
+      },
+      removeItem: (key) => {
+        try {
+          if (typeof(Storage) !== "undefined") {
+            localStorage.removeItem(key);
+          }
+        } catch (e) {
+          console.warn('localStorage not available:', e);
+        }
+      }
+    };
+
+    function applyTheme(theme) {
+      const vars = themes[theme];
+      for (const key in vars) {
+        document.documentElement.style.setProperty(key, vars[key]);
+      }
+      SafeStorage.setItem("selectedTheme", theme);
+      populateMappingOptions(vars);
+    }
+
+    function populateMappingOptions(themeVars) {
+      // First, remove ALL existing color-dot-group elements and restore original labels
+      document.querySelectorAll('.color-dot-group').forEach(group => group.remove());
+      
+      // Restore all original labels to be visible
+      document.querySelectorAll('.dot-label').forEach(label => {
+        label.style.display = '';
+      });
+
+      Object.entries(mappings).forEach(([selectId, cssVar]) => {
+        const select = document.getElementById(selectId);
+        const label = select.previousElementSibling;
+
+        const group = document.createElement("div");
+        group.className = "color-dot-group";
+
+        // Don't hide the original label - just clone it
+        const labelClone = label.cloneNode(true);
+        select.style.display = "none";
+        group.appendChild(labelClone);
+
+        const row = document.createElement("div");
+        row.className = "dot-row";
+
+        Object.entries(themeVars).forEach(([key, val]) => {
+          const dot = document.createElement("div");
+          dot.style.width = "20px";
+          dot.style.height = "20px";
+          dot.style.borderRadius = "50%";
+          dot.style.backgroundColor = val;
+          dot.style.border = "1px solid #ccc";
+          dot.style.cursor = "pointer";
+          dot.title = key.replace("--", "");
+
+          dot.onclick = () => {
+            document.documentElement.style.setProperty(cssVar, val);
+            SafeStorage.setItem(cssVar, val);
+            renderLinks();
+          };
+
+          row.appendChild(dot);
+        });
+
+        group.appendChild(row);
+        label.parentNode.insertBefore(group, select.nextSibling);
+        
+        // Now hide the original label since we have the clone
+        label.style.display = "none";
+      });
+    }
+
+    function renderThemeSelector() {
+      const container = document.getElementById("themeSelector");
+      container.innerHTML = "";
+      Object.entries(themes).forEach(([name, vars]) => {
+        const wrapper = document.createElement("div");
+        wrapper.style.cursor = "pointer";
+        wrapper.style.padding = "6px";
+        wrapper.style.border = "1px solid #ccc";
+        wrapper.style.borderRadius = "6px";
+        wrapper.setAttribute("data-theme", name);
+
+        const label = document.createElement("div");
+        label.textContent = name;
+        wrapper.appendChild(label);
+
+        const palette = document.createElement("div");
+        palette.className = "theme-palette";
+        Object.values(vars).forEach(color => {
+          const swatch = document.createElement("div");
+          swatch.style.background = color;
+          palette.appendChild(swatch);
+        });
+
+        wrapper.appendChild(palette);
+        wrapper.onclick = () => {
+          applyTheme(name);
+          highlightTheme(name);
+          renderLinks();
+        };
+
+        container.appendChild(wrapper);
+      });
+    }
+
+    function highlightTheme(name) {
+      document.querySelectorAll("#themeSelector > div").forEach(div => {
+        div.classList.toggle("theme-selected", div.getAttribute("data-theme") === name);
+      });
+    }
+
+    document.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", () => {
+        Object.entries(mappings).forEach(([selectId, cssVar]) => {
+          const val = document.getElementById(selectId).value;
+          document.documentElement.style.setProperty(cssVar, val);
+          SafeStorage.setItem(cssVar, val);
+        });
+        renderLinks();
+      });
+    });
+
+    function restoreMappings() {
+      Object.entries(mappings).forEach(([id, varName]) => {
+        const val = SafeStorage.getItem(varName);
+        if (val) document.documentElement.style.setProperty(varName, val);
+      });
+    }
+
+    document.getElementById('saveThemeBtn').addEventListener('click', () => {
+      const currentTheme = { name: 'Custom Theme', colors: {} };
+      Object.entries(mappings).forEach(([selectId, cssVar]) => {
+        const val = document.getElementById(selectId).value;
+        currentTheme.colors[cssVar] = val;
+        SafeStorage.setItem(cssVar, val);
+      });
+      SafeStorage.setItem('customTheme', JSON.stringify(currentTheme));
+      const btn = document.getElementById('saveThemeBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Theme Saved!';
+      btn.style.backgroundColor = '#4CAF50';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.backgroundColor = '';
+      }, 2000);
+    });
+
+    const form = document.getElementById("linkForm");
+    const container = document.getElementById("categoriesContainer");
+    const categorySelect = document.getElementById("categorySelect");
+    const customCategoryInput = document.getElementById("customCategory");
+    let savedLinks = JSON.parse(SafeStorage.getItem("customLinksWithCategories")) || [];
+    let savedCategories = JSON.parse(SafeStorage.getItem("customCategories")) || [];
+
+    function updateCategoryOptions() {
+      categorySelect.innerHTML = '<option value="" disabled selected>Choose category</option>';
+      savedCategories.forEach(cat => categorySelect.appendChild(new Option(cat, cat)));
+      categorySelect.appendChild(new Option("+ New category...", "__custom__"));
+    }
+
+    categorySelect.addEventListener("change", () => {
+      customCategoryInput.style.display = categorySelect.value === "__custom__" ? "block" : "none";
+      customCategoryInput.required = categorySelect.value === "__custom__";
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const title = document.getElementById("linkTitle").value.trim();
+      const url = document.getElementById("linkURL").value.trim();
+      let category = categorySelect.value;
+      if (category === "__custom__") {
+        category = customCategoryInput.value.trim();
+        if (category && !savedCategories.includes(category)) {
+          savedCategories.push(category);
+          SafeStorage.setItem("customCategories", JSON.stringify(savedCategories));
+          updateCategoryOptions();
+        }
+      }
+
+      if (title && url && category) {
+        savedLinks.push({ title, url, category });
+        SafeStorage.setItem("customLinksWithCategories", JSON.stringify(savedLinks));
+        renderLinks();
+        form.reset();
+        customCategoryInput.style.display = "none";
+        updateCategoryOptions();
+      }
+    });
+
+    function groupLinksByCategory(links) {
+      const grouped = {};
+      links.forEach(link => {
+        (grouped[link.category] = grouped[link.category] || []).push(link);
+      });
+      return grouped;
+    }
+
+    function renderLinks() {
+      container.innerHTML = "";
+      const grouped = groupLinksByCategory(savedLinks);
+      Object.entries(grouped).forEach(([category, links]) => {
+        const card = document.createElement("div");
+        card.className = "category-card";
+        
+        // Create category header with edit and delete buttons
+        const headerDiv = document.createElement("div");
+        headerDiv.className = "category-header";
+        
+        const h2 = document.createElement("h2");
+        h2.textContent = category;
+        headerDiv.appendChild(h2);
+        
+        const editCategoryBtn = document.createElement("button");
+        editCategoryBtn.className = "edit-category";
+        editCategoryBtn.innerHTML = "✎";
+        editCategoryBtn.title = `Edit "${category}" category name`;
+        editCategoryBtn.onclick = (e) => {
+          e.preventDefault();
+          editCategory(category);
+        };
+        headerDiv.appendChild(editCategoryBtn);
+        
+        const deleteCategoryBtn = document.createElement("button");
+        deleteCategoryBtn.className = "delete-category";
+        deleteCategoryBtn.innerHTML = "×";
+        deleteCategoryBtn.title = `Delete "${category}" category`;
+        deleteCategoryBtn.onclick = (e) => {
+          e.preventDefault();
+          deleteCategory(category);
+        };
+        headerDiv.appendChild(deleteCategoryBtn);
+        
+        card.appendChild(headerDiv);
+
+        const grid = document.createElement("div");
+        grid.className = "link-grid";
+        
+        links.forEach((link, linkIndex) => {
+          const linkWrapper = document.createElement("div");
+          linkWrapper.style.position = "relative";
+          
+          const a = document.createElement("a");
+          a.href = link.url;
+          a.target = "_blank";
+          a.textContent = link.title;
+          
+          const editLinkBtn = document.createElement("button");
+          editLinkBtn.className = "edit-link";
+          editLinkBtn.innerHTML = "✎";
+          editLinkBtn.title = `Edit "${link.title}"`;
+          editLinkBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            editLink(link);
+          };
+          
+          const deleteLinkBtn = document.createElement("button");
+          deleteLinkBtn.className = "delete-link";
+          deleteLinkBtn.innerHTML = "×";
+          deleteLinkBtn.title = `Delete "${link.title}"`;
+          deleteLinkBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            deleteLink(link);
+          };
+          
+          a.appendChild(editLinkBtn);
+          a.appendChild(deleteLinkBtn);
+          linkWrapper.appendChild(a);
+          grid.appendChild(linkWrapper);
+        });
+
+        card.appendChild(grid);
+        container.appendChild(card);
+      });
+    }
+
+    function editLink(linkToEdit) {
+      const modal = document.createElement("div");
+      modal.className = "edit-modal";
+      
+      modal.innerHTML = `
+        <div class="edit-modal-content">
+          <h3>Edit Link</h3>
+          <input type="text" id="editLinkTitle" placeholder="Title" value="${linkToEdit.title}" />
+          <input type="url" id="editLinkURL" placeholder="https://example.com" value="${linkToEdit.url}" />
+          <select id="editLinkCategory">
+            ${savedCategories.map(cat => 
+              `<option value="${cat}" ${cat === linkToEdit.category ? 'selected' : ''}>${cat}</option>`
+            ).join('')}
+          </select>
+          <div class="edit-modal-buttons">
+            <button class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+            <button class="save-btn" onclick="saveEditedLink('${linkToEdit.title.replace(/'/g, "\\'")}', '${linkToEdit.url.replace(/'/g, "\\'")}', '${linkToEdit.category.replace(/'/g, "\\'")}')">Save</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      document.getElementById('editLinkTitle').focus();
+      
+      // Close modal when clicking outside
+      modal.onclick = (e) => {
+        if (e.target === modal) closeEditModal();
+      };
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+          closeEditModal();
+          document.removeEventListener('keydown', escapeHandler);
+        }
+      });
+      
+      // Save with Enter key (when not in select)
+      modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.tagName !== 'SELECT') {
+          saveEditedLink(linkToEdit.title, linkToEdit.url, linkToEdit.category);
+        }
+      });
+    }
+
+    function saveEditedLink(originalTitle, originalUrl, originalCategory) {
+      const newTitle = document.getElementById('editLinkTitle').value.trim();
+      const newUrl = document.getElementById('editLinkURL').value.trim();
+      const newCategory = document.getElementById('editLinkCategory').value;
+      
+      if (!newTitle || !newUrl || !newCategory) {
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      // Find and update the link
+      const linkIndex = savedLinks.findIndex(link => 
+        link.title === originalTitle && link.url === originalUrl && link.category === originalCategory
+      );
+      
+      if (linkIndex !== -1) {
+        savedLinks[linkIndex] = {
+          title: newTitle,
+          url: newUrl,
+          category: newCategory
+        };
+        
+        SafeStorage.setItem("customLinksWithCategories", JSON.stringify(savedLinks));
+        renderLinks();
+        closeEditModal();
+      }
+    }
+
+    function editCategory(categoryToEdit) {
+      const newCategoryName = prompt(`Rename category "${categoryToEdit}" to:`, categoryToEdit);
+      
+      if (newCategoryName && newCategoryName.trim() && newCategoryName.trim() !== categoryToEdit) {
+        const trimmedName = newCategoryName.trim();
+        
+        // Check if new name already exists
+        if (savedCategories.includes(trimmedName)) {
+          alert('A category with that name already exists');
+          return;
+        }
+        
+        // Update all links in this category
+        savedLinks = savedLinks.map(link => {
+          if (link.category === categoryToEdit) {
+            return { ...link, category: trimmedName };
+          }
+          return link;
+        });
+        
+        // Update saved categories
+        const categoryIndex = savedCategories.indexOf(categoryToEdit);
+        if (categoryIndex !== -1) {
+          savedCategories[categoryIndex] = trimmedName;
+        }
+        
+        SafeStorage.setItem("customLinksWithCategories", JSON.stringify(savedLinks));
+        SafeStorage.setItem("customCategories", JSON.stringify(savedCategories));
+        
+        updateCategoryOptions();
+        renderLinks();
+      }
+    }
+
+    function closeEditModal() {
+      const modal = document.querySelector('.edit-modal');
+      if (modal) {
+        modal.remove();
+      }
+    }
+
+    // Make functions global so they can be called from modal HTML
+    window.closeEditModal = closeEditModal;
+    window.saveEditedLink = saveEditedLink;
+
+    function deleteLink(linkToDelete) {
+      if (confirm(`Are you sure you want to delete "${linkToDelete.title}"?`)) {
+        savedLinks = savedLinks.filter(link => 
+          !(link.title === linkToDelete.title && link.url === linkToDelete.url && link.category === linkToDelete.category)
+        );
+        SafeStorage.setItem("customLinksWithCategories", JSON.stringify(savedLinks));
+        renderLinks();
+      }
+    }
+
+    function deleteCategory(categoryToDelete) {
+      const linksInCategory = savedLinks.filter(link => link.category === categoryToDelete);
+      const confirmMessage = `Are you sure you want to delete the "${categoryToDelete}" category and all ${linksInCategory.length} links in it?`;
+      
+      if (confirm(confirmMessage)) {
+        // Remove all links in this category
+        savedLinks = savedLinks.filter(link => link.category !== categoryToDelete);
+        
+        // Remove category from saved categories
+        savedCategories = savedCategories.filter(cat => cat !== categoryToDelete);
+        
+        SafeStorage.setItem("customLinksWithCategories", JSON.stringify(savedLinks));
+        SafeStorage.setItem("customCategories", JSON.stringify(savedCategories));
+        
+        updateCategoryOptions();
+        renderLinks();
+      }
+    }
+
+    // Sidebar toggle functionality
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    
+    function toggleSidebar() {
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        sidebar.classList.remove('collapsed');
+        toggleBtn.textContent = '‹';
+        toggleBtn.title = 'Collapse Sidebar';
+        SafeStorage.setItem('sidebarCollapsed', 'false');
+      } else {
+        sidebar.classList.add('collapsed');
+        toggleBtn.textContent = '›';
+        toggleBtn.title = 'Expand Sidebar';
+        SafeStorage.setItem('sidebarCollapsed', 'true');
+      }
+    }
+    
+    // Restore sidebar state
+    function restoreSidebarState() {
+      const isCollapsed = SafeStorage.getItem('sidebarCollapsed') === 'true';
+      if (isCollapsed) {
+        sidebar.classList.add('collapsed');
+        toggleBtn.textContent = '›';
+        toggleBtn.title = 'Expand Sidebar';
+      }
+    }
+    
+    toggleBtn.addEventListener('click', toggleSidebar);
+
+    const savedTheme = SafeStorage.getItem("selectedTheme") || "Elegant Midnight";
+    renderThemeSelector();
+    applyTheme(savedTheme);
+    highlightTheme(savedTheme);
+    restoreMappings();
+    restoreSidebarState();
+    updateCategoryOptions();
+    renderLinks();
+  </script>
+</body>
+</html>
