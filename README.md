@@ -12,6 +12,66 @@ A beautiful, customizable start page that replaces your new tab with organized b
 - **Fully Accessible**: Keyboard navigation and screen reader support
 - **Persistent Storage**: Never lose your data - uses Chrome's storage API
 
+## Standalone Start Page Features
+
+**Data Persistence Guaranteed:**
+
+- Uses localStorage - Your browser's built-in storage that persists between sessions
+- No internet required - Works completely offline
+- Automatic saving - Every change (add, edit, delete, reorder) is saved immediately
+- Browser storage - Data stays until you manually clear it
+
+**What Protects Your Data:**
+
+- localStorage is persistent and survives:
+- Browser restarts
+- Computer reboots
+- Browser updates
+- Power outages
+- Internet disconnections
+
+**Extra Safety Features:**
+
+- Export function - Download backup files anytime
+- Import function - Restore from backups if needed
+- Data validation - Checks data integrity on load
+
+**Bottom Line:**
+
+Your links are as safe as your browser bookmarks - they'll persist indefinitely unless you intentionally delete them. The standalone page is actually more reliable than cloud-based solutions since it doesn't depend on external services or internet connectivity.
+**Pro tip:** Export your data periodically as a backup file for extra peace of mind.
+
+**All Original Features:**
+
+- 5 beautiful themes
+- Drag & drop link organization
+- Search functionality
+- Category management
+- Responsive design
+
+**How to Use:**
+
+- Save the file as standalone-start.html on your computer
+- Double-click to open it in any browser
+- Bookmark the page for easy access
+- Set as homepage if you want it to load automatically
+
+**Data Safety:**
+
+- Your links are stored in your browser's localStorage
+- Export regularly to create backup files
+- Keep backup files safe - they contain all your bookmarks
+- Import feature lets you restore everything instantly
+
+**Pro Tips:**
+
+- Bookmark this page in your browser's bookmarks bar
+- Export your data after adding many links
+- Set as homepage in your browser settings
+- Works in any modern browser (Chrome, Firefox, Safari, Edge)
+
+Your data will never be lost as long as you don't clear your browser's storage, and with the export feature, you can always create backups for extra safety!
+
 ## Installation
 
 1. **Enable Developer Mode**:
@@ -26,22 +86,26 @@ A beautiful, customizable start page that replaces your new tab with organized b
 ## Usage
 
 ### Adding Bookmarks
+
 1. Fill in the title and URL
 2. Choose an existing category or create a new one
 3. Click "Add Bookmark"
 
 ### Organizing Links
+
 - **Drag & Drop**: Move links within categories or between categories
 - **Edit**: Click the pencil icon to modify links
 - **Delete**: Click the × icon to remove links
 - **Categories**: Edit or delete entire categories
 
 ### Customizing Themes
+
 1. **Select Theme**: Choose from 5 built-in themes in the sidebar
 2. **Custom Colors**: Map any theme color to page elements
 3. **Save Theme**: Save your custom color combinations
 
 ### Searching
+
 - Use the search bar to find links by title, URL, or category
 - Press `Ctrl+F` to quickly focus the search
 - Press `Escape` to clear search
@@ -56,20 +120,24 @@ A beautiful, customizable start page that replaces your new tab with organized b
 ## Technical Details
 
 ### Storage
+
 - Uses Chrome's `chrome.storage.local` API for reliable data persistence
 - Automatically syncs across devices when signed into Chrome
-- Falls back to localStorage for standalone use
+- Falls back to localStorage for standalone use¬
 
 ### Permissions
+
 - **storage**: Required to save bookmarks and settings
 - **chrome_url_overrides**: Required to replace new tab page
 
 ### Content Security Policy
+
 - Implements strict CSP for enhanced security
 - All scripts are loaded from extension's origin
 - No inline scripts allowed
 
 ### Files
+
 - `manifest.json`: Extension configuration and CSP settings
 - `start.html`: Main start page interface
 - `script.js`: All JavaScript functionality

@@ -1,692 +1,796 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A customizable start page with bookmark management, theme selection, and search functionality" />
-  <meta name="author" content="Mirabelle Doiron" />
-  <title>My Start Page - New Tab</title>
-  <style>
-    :root {
-      --primary: #0D1B2A;
-      --secondary: #1B263B;
-      --accent: #E0A458;
-      --background: #F4F4F4;
-      --text: #0D1B2A;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A customizable start page with bookmark management, theme selection, and search functionality"
+    />
+    <meta name="author" content="Mirabelle Doiron" />
+    <title>My Start Page - New Tab</title>
+    <style>
+      :root {
+        --primary: #0d1b2a;
+        --secondary: #1b263b;
+        --accent: #e0a458;
+        --background: #f4f4f4;
+        --text: #0d1b2a;
+        --danger: #ff3b30;
 
-      --font-family: Helvetica, sans-serif;
+        --font-family: Helvetica, sans-serif;
 
-      --page-bg: var(--primary);
-      --card-bg: var(--secondary);
-      --header-color: var(--accent);
-      --text-color: var(--text);
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      font-family: var(--font-family);
-      background-color: var(--page-bg);
-      color: var(--text-color);
-    }
-
-    h1, h2 {
-      text-align: center;
-      color: var(--header-color);
-    }
-
-    /* Skip link for keyboard navigation */
-    .skip-link {
-      position: absolute;
-      top: -40px;
-      left: 6px;
-      background: var(--accent);
-      color: white;
-      padding: 8px;
-      text-decoration: none;
-      border-radius: 4px;
-      z-index: 1000;
-      font-weight: bold;
-    }
-
-    .skip-link:focus {
-      top: 6px;
-    }
-
-    /* Accessibility improvements */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    /* Focus indicators for accessibility */
-    button:focus,
-    input:focus,
-    select:focus,
-    a:focus {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    /* High contrast mode support */
-    @media (prefers-contrast: high) {
-      #searchInput {
-        border: 2px solid #000;
+        --page-bg: var(--primary);
+        --card-bg: var(--secondary);
+        --header-color: var(--accent);
+        --text-color: var(--text);
       }
-      
-      #clearSearch {
-        border: 1px solid #000;
-      }
-    }
 
-    /* Reduced motion support */
-    @media (prefers-reduced-motion: reduce) {
       * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* Search Bar Styles - Minimal and accessible */
-    .search-container {
-      max-width: 1000px;
-      margin: 0 auto 20px;
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    #searchInput {
-      width: 250px;
-      padding: 6px 10px;
-      font-size: 13px;
-      border-radius: 15px;
-      border: 1px solid #e0e0e0;
-      background: #f8f9fa;
-      color: var(--text);
-      transition: all 0.2s ease;
-    }
-
-    #searchInput:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: white;
-      width: 320px;
-    }
-
-    #searchInput::placeholder {
-      color: #aaa;
-      font-style: italic;
-    }
-
-    #clearSearch {
-      width: 20px;
-      height: 20px;
-      padding: 0;
-      background: #e9ecef;
-      color: #6c757d;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 12px;
-      display: none; /* Initially hidden */
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      opacity: 0.6;
-      line-height: 1;
-    }
-
-    #clearSearch:hover {
-      background: #dc3545;
-      color: white;
-      opacity: 1;
-      transform: scale(1.1);
-    }
-
-    .search-stats {
-      text-align: center;
-      color: var(--header-color);
-      font-size: 11px;
-      margin-bottom: 10px;
-      font-style: italic;
-      opacity: 0.8;
-    }
-
-    form {
-      max-width: 1000px;
-      margin: 0 auto 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-
-    input, select, button {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      width: 100%;
-    }
-
-    button {
-      background-color: var(--accent);
-      color: var(--background);
-      cursor: pointer;
-    }
-
-    button:hover { opacity: 0.9; }
-
-    #customCategory { display: none; }
-
-    .category-card {
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      font-family: var(--font-family);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 1000px;
-      transition: opacity 0.3s ease;
-    }
-
-    .category-card.hidden {
-      display: none;
-    }
-
-    .category-card h2 {
-      color: var(--header-color) !important;
-      text-align: center;
-    }
-
-    .link-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
-      min-height: 60px; /* Allows for drop zones */
-    }
-
-    /* Drag and Drop Styles */
-    .link-grid a {
-      display: block;
-      background: white;
-      padding: 12px 18px;
-      border-radius: 8px;
-      text-decoration: none;
-      color: var(--text-color);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s ease;
-      position: relative;
-      cursor: move;
-      draggable: true;
-    }
-
-    .link-grid a:hover {
-      background-color: var(--accent);
-      color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .link-grid a.dragging {
-      opacity: 0.5;
-      transform: rotate(3deg);
-      z-index: 1000;
-    }
-
-    .link-grid a.hidden {
-      display: none;
-    }
-
-    .link-grid.drag-over {
-      background: rgba(224, 164, 88, 0.1);
-      border: 2px dashed var(--accent);
-      border-radius: 8px;
-    }
-
-    @keyframes pulse {
-      from { opacity: 0.4; }
-      to { opacity: 1; }
-    }
-
-    /* Drag handle */
-    .drag-handle {
-      position: absolute;
-      left: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #ccc;
-      font-size: 14px;
-      cursor: move;
-      padding: 2px;
-      border-radius: 2px;
-      transition: all 0.2s ease;
-    }
-
-    .link-grid a:hover .drag-handle {
-      color: white;
-      background: rgba(0,0,0,0.2);
-    }
-
-    /* Search highlighting */
-    .highlight {
-      background-color: yellow;
-      color: black;
-      font-weight: bold;
-    }
-
-    .delete-link {
-      position: absolute;
-      top: 5px;
-      right: 8px;
-      background: #ff4444;
-      color: white;
-      border: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      font-size: 12px;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    .edit-link {
-      position: absolute;
-      top: 5px;
-      right: 35px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      font-size: 10px;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    .link-grid a:hover .delete-link,
-    .link-grid a:hover .edit-link {
-      display: flex;
-    }
-
-    .delete-link:hover {
-      background: #cc0000;
-    }
-
-    .edit-link:hover {
-      background: #45a049;
-    }
-
-    .category-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .delete-category {
-      position: absolute;
-      right: 0;
-      background: #ff4444;
-      color: white;
-      border: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    .edit-category {
-      position: absolute;
-      right: 30px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-    }
-
-    .delete-category:hover {
-      background: #cc0000;
-    }
-
-    .edit-category:hover {
-      background: #45a049;
-    }
-
-    .edit-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .edit-modal-content {
-      background: var(--background);
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .edit-modal h3 {
-      color: var(--header-color);
-      margin-top: 0;
-      text-align: center;
-    }
-
-    .edit-modal input, .edit-modal select {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    .edit-modal-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 20px;
-    }
-
-    .edit-modal button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .save-btn {
-      background: var(--accent);
-      color: white;
-    }
-
-    .cancel-btn {
-      background: #6c757d;
-      color: white;
-    }
-
-    .theme-palette {
-      display: flex;
-      gap: 5px;
-      margin-top: 5px;
-    }
-
-    .theme-palette div {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-
-    .theme-selected {
-      font-weight: bold;
-      border: 2px solid var(--accent);
-    }
-
-    .color-dot-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 12px;
-    }
-
-    .color-dot-group .dot-label {
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #595959 !important;
-    }
-
-    .dot-label {
-      color: #595959 !important;
-    }
-
-    #themeSelector {
-      color: #595959 !important;
-    }
-
-    #themeSelector > div {
-      color: #595959 !important;
-    }
-
-    .color-dot-group .dot-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .sidebar {
-      width: 340px;
-      padding: 20px;
-      background: var(--background);
-      border-right: 1px solid #ccc;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .sidebar.collapsed {
-      width: 60px;
-      padding: 20px 10px;
-    }
-
-    .sidebar.collapsed > *:not(.toggle-btn) {
-      display: none !important;
-    }
-
-    .sidebar.collapsed h2 {
-      display: none !important;
-    }
-
-    .sidebar.collapsed label {
-      display: none !important;
-    }
-
-    .sidebar.collapsed select {
-      display: none !important;
-    }
-
-    .sidebar.collapsed button:not(.toggle-btn) {
-      display: none !important;
-    }
-
-    .sidebar.collapsed #themeSelector {
-      display: none !important;
-    }
-
-    .sidebar.collapsed .color-dot-group {
-      display: none !important;
-    }
-
-    .toggle-btn {
-      position: absolute;
-      top: 20px;
-      right: 15px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    .toggle-btn:hover {
-      opacity: 0.8;
-    }
-
-    .sidebar.collapsed .toggle-btn {
-      right: 15px;
-    }
-
-    .main-content {
-      flex: 1;
-      padding: 20px;
-      transition: all 0.3s ease;
-    }
-
-    @media (max-width: 600px) {
-      form, .link-grid { grid-template-columns: 1fr; }
-      
-      .sidebar {
-        width: 280px;
-      }
-      
-      .sidebar.collapsed {
-        width: 50px;
+        box-sizing: border-box;
       }
 
+      html,
+      body {
+        margin: 0;
+        font-family: var(--font-family);
+        background-color: var(--page-bg);
+        color: var(--text-color);
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+        color: var(--header-color);
+      }
+
+      /* Skip link for keyboard navigation */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--accent);
+        color: white;
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1000;
+        font-weight: bold;
+      }
+
+      .skip-link:focus {
+        top: 6px;
+      }
+
+      /* Accessibility improvements */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* Focus indicators for accessibility */
+      button:focus,
+      input:focus,
+      select:focus,
+      a:focus {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        #searchInput {
+          border: 2px solid #000;
+        }
+
+        #clearSearch {
+          border: 1px solid #000;
+        }
+      }
+
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* Search Bar Styles - Minimal and accessible */
       .search-container {
-        flex-direction: column;
-        gap: 8px;
+        max-width: 1000px;
+        margin: 0 auto 20px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        justify-content: center;
+        position: relative;
       }
 
       #searchInput {
-        width: 200px !important;
-        max-width: 250px;
+        width: 250px;
+        padding: 6px 10px;
+        font-size: 13px;
+        border-radius: 15px;
+        border: 1px solid #e0e0e0;
+        background: #f8f9fa;
+        color: var(--text);
+        transition: all 0.2s ease;
       }
 
       #searchInput:focus {
-        width: 250px !important;
+        outline: none;
+        border-color: var(--accent);
+        background: white;
+        width: 320px;
       }
-    }
-  </style>
-</head>
-<body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-  <div style="display: flex; min-height: 100vh;">
-    <aside id="sidebar" class="sidebar" role="complementary" aria-label="Theme customization">
-      <button id="toggleSidebar" class="toggle-btn" title="Toggle Sidebar" aria-label="Toggle theme customization sidebar" aria-expanded="true">‹</button>
-      
-      <h2>Select Theme</h2>
-      <div id="themeSelector" style="display: flex; flex-direction: column; gap: 10px;" role="radiogroup" aria-label="Choose theme"></div>
 
-      <h2>Map Colors</h2>
-      <div role="group" aria-label="Color mapping options">
-        <label class="dot-label" for="pageBgSelect">Page Background</label>
-        <select id="pageBgSelect" aria-label="Choose page background color"></select>
+      #searchInput::placeholder {
+        color: #aaa;
+        font-style: italic;
+      }
 
-        <label class="dot-label" for="cardBgSelect">Card Background</label>
-        <select id="cardBgSelect" aria-label="Choose card background color"></select>
+      #clearSearch {
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        background: #e9ecef;
+        color: #6c757d;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+        display: none; /* Initially hidden */
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        opacity: 0.6;
+        line-height: 1;
+      }
 
-        <label class="dot-label" for="headerColorSelect">Header Color</label>
-        <select id="headerColorSelect" aria-label="Choose header color"></select>
+      #clearSearch:hover {
+        background: #dc3545;
+        color: white;
+        opacity: 1;
+        transform: scale(1.1);
+      }
 
-        <label class="dot-label" for="textColorSelect">Text Color</label>
-        <select id="textColorSelect" aria-label="Choose text color"></select>
-      </div>
+      .search-stats {
+        text-align: center;
+        color: var(--header-color);
+        font-size: 11px;
+        margin-bottom: 10px;
+        font-style: italic;
+        opacity: 0.8;
+      }
 
-      <button id="saveThemeBtn" style="margin-top: 20px;" aria-label="Save current theme customizations">Save Theme</button>
-    </aside>
+      form {
+        max-width: 1000px;
+        margin: 0 auto 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+      }
 
-    <main class="main-content">
-      <h1>My Start Page</h1>
+      input,
+      select,
+      button {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: none;
+        width: 100%;
+      }
 
-      <form id="linkForm" role="form" aria-label="Add new bookmark">
-        <label for="linkTitle" class="sr-only">Bookmark title</label>
-        <input type="text" id="linkTitle" placeholder="Title" required aria-describedby="linkTitleHelp" />
-        
-        <label for="linkURL" class="sr-only">Bookmark URL</label>
-        <input type="url" id="linkURL" placeholder="https://example.com" required aria-describedby="linkURLHelp" />
-        
-        <label for="categorySelect" class="sr-only">Category</label>
-        <select id="categorySelect" required aria-describedby="categoryHelp">
-          <option value="" disabled selected>Choose category</option>
-          <option value="__custom__">+ New category...</option>
-        </select>
-        
-        <label for="customCategory" class="sr-only">New category name</label>
-        <input type="text" id="customCategory" placeholder="Enter new category" aria-describedby="customCategoryHelp" />
-        
-        <button type="submit" aria-describedby="addButtonHelp">Add Bookmark</button>
-      </form>
+      button {
+        background-color: var(--accent);
+        color: var(--background);
+        cursor: pointer;
+      }
 
-      <!-- Hidden help text for screen readers -->
-      <div class="sr-only">
-        <div id="linkTitleHelp">Enter a descriptive title for your bookmark</div>
-        <div id="linkURLHelp">Enter the complete web address including https://</div>
-        <div id="categoryHelp">Choose an existing category or create a new one</div>
-        <div id="customCategoryHelp">Enter the name for your new category</div>
-        <div id="addButtonHelp">Add this bookmark to your collection</div>
-      </div>
+      button:hover {
+        opacity: 0.9;
+      }
 
-      <!-- Search/Filter Section - Minimal and accessible -->
-      <div class="search-container" role="search">
-        <label for="searchInput" class="sr-only">Search your bookmarks</label>
-        <input 
-          type="search" 
-          id="searchInput" 
-          placeholder="🔍 Search your links" 
-          aria-label="Search your bookmarks and categories"
-          aria-describedby="searchStats"
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <button 
-          id="clearSearch" 
-          type="button"
-          aria-label="Clear search"
-          title="Clear search (Escape key)"
-        >×</button>
-      </div>
+      #customCategory {
+        display: none;
+      }
 
-      <div id="searchStats" class="search-stats" style="display: none;" aria-live="polite" aria-atomic="true"></div>
+      .category-card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        font-family: var(--font-family);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 1000px;
+        transition: opacity 0.3s ease;
+      }
 
-      <div id="categoriesContainer"></div>
-    </main>
-  </div>
+      .category-card.hidden {
+        display: none;
+      }
 
-  <footer style="text-align: center; padding: 0.5em; background: var(--card-bg); color: #e0e0e0;">
-    <p>© <span id="currentYear"></span> All Rights Reserved</p>
-    <p>Created by <a href="https://mirabelledoiron.com/" target="_blank" style="color: var(--accent); text-decoration: none;">Mirabelle</a>, customized by you</p>
-  </footer>
+      .category-card h2 {
+        color: var(--header-color) !important;
+        text-align: center;
+      }
 
-  <script src="script.js"></script>
-</body>
+      .link-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+        min-height: 60px; /* Allows for drop zones */
+      }
+
+      /* Drag and Drop Styles */
+      .link-grid a {
+        display: block;
+        background: white;
+        padding: 12px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--text-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        position: relative;
+        cursor: move;
+      }
+
+      .link-grid a:hover {
+        background-color: var(--accent);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .link-grid a.dragging {
+        opacity: 0.5;
+        transform: rotate(3deg);
+        z-index: 1000;
+      }
+
+      .link-grid a.hidden {
+        display: none;
+      }
+
+      .link-grid.drag-over {
+        background: rgba(224, 164, 88, 0.1);
+        border: 2px dashed var(--accent);
+        border-radius: 8px;
+      }
+
+      @keyframes pulse {
+        from {
+          opacity: 0.4;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Drag handle */
+      .drag-handle {
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ccc;
+        font-size: 14px;
+        cursor: move;
+        padding: 2px;
+        border-radius: 2px;
+        transition: all 0.2s ease;
+      }
+
+      .link-grid a:hover .drag-handle {
+        color: white;
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      /* Search highlighting */
+      .highlight {
+        background-color: yellow;
+        color: black;
+        font-weight: bold;
+      }
+
+      .delete-link {
+        position: absolute;
+        top: 5px;
+        right: 8px;
+        background: #ff4444;
+        color: white;
+        border: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        font-size: 12px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .edit-link {
+        position: absolute;
+        top: 5px;
+        right: 35px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        font-size: 10px;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .link-grid a:hover .delete-link,
+      .link-grid a:hover .edit-link {
+        display: flex;
+      }
+
+      .delete-link:hover {
+        background: #cc0000;
+      }
+
+      .edit-link:hover {
+        background: #45a049;
+      }
+
+      .category-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .delete-category {
+        position: absolute;
+        right: 0;
+        background: #ff4444;
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .edit-category {
+        position: absolute;
+        right: 30px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .delete-category:hover {
+        background: #cc0000;
+      }
+
+      .edit-category:hover {
+        background: #45a049;
+      }
+
+      .edit-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .edit-modal-content {
+        background: var(--background);
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .edit-modal h3 {
+        color: var(--header-color);
+        margin-top: 0;
+        text-align: center;
+      }
+
+      .edit-modal input,
+      .edit-modal select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+
+      .edit-modal-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .edit-modal button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .save-btn {
+        background: var(--accent);
+        color: white;
+      }
+
+      .cancel-btn {
+        background: #6c757d;
+        color: white;
+      }
+
+      .theme-palette {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      .theme-palette div {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      .theme-selected {
+        font-weight: bold;
+        border: 2px solid var(--accent);
+      }
+
+      .color-dot-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+      }
+
+      .color-dot-group .dot-label {
+        margin-bottom: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #595959 !important;
+      }
+
+      .dot-label {
+        color: #595959 !important;
+      }
+
+      #themeSelector {
+        color: #595959 !important;
+      }
+
+      #themeSelector > div {
+        color: #595959 !important;
+      }
+
+      .color-dot-group .dot-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .sidebar {
+        width: 340px;
+        padding: 20px;
+        background: var(--background);
+        border-right: 1px solid #ccc;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .sidebar.collapsed {
+        width: 60px;
+        padding: 20px 10px;
+      }
+
+      .sidebar.collapsed > *:not(.toggle-btn) {
+        display: none !important;
+      }
+
+      .sidebar.collapsed h2 {
+        display: none !important;
+      }
+
+      .sidebar.collapsed label {
+        display: none !important;
+      }
+
+      .sidebar.collapsed select {
+        display: none !important;
+      }
+
+      .sidebar.collapsed button:not(.toggle-btn) {
+        display: none !important;
+      }
+
+      .sidebar.collapsed #themeSelector {
+        display: none !important;
+      }
+
+      .sidebar.collapsed .color-dot-group {
+        display: none !important;
+      }
+
+      .toggle-btn {
+        position: absolute;
+        top: 20px;
+        right: 15px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+
+      .toggle-btn:hover {
+        opacity: 0.8;
+      }
+
+      .sidebar.collapsed .toggle-btn {
+        right: 15px;
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+
+      @media (max-width: 600px) {
+        form,
+        .link-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          width: 280px;
+        }
+
+        .sidebar.collapsed {
+          width: 50px;
+        }
+
+        .search-container {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        #searchInput {
+          width: 200px !important;
+          max-width: 250px;
+        }
+
+        #searchInput:focus {
+          width: 250px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div style="display: flex; min-height: 100vh">
+      <aside
+        id="sidebar"
+        class="sidebar"
+        role="complementary"
+        aria-label="Theme customization"
+      >
+        <button
+          id="toggleSidebar"
+          class="toggle-btn"
+          title="Toggle Sidebar"
+          aria-label="Toggle theme customization sidebar"
+          aria-expanded="true"
+        >
+          ‹
+        </button>
+
+        <h2>Select Theme</h2>
+        <div
+          id="themeSelector"
+          style="display: flex; flex-direction: column; gap: 10px"
+          role="radiogroup"
+          aria-label="Choose theme"
+        ></div>
+
+        <h2>Map Colors</h2>
+        <div role="group" aria-label="Color mapping options">
+          <label class="dot-label" for="pageBgSelect">Page Background</label>
+          <select
+            id="pageBgSelect"
+            aria-label="Choose page background color"
+          ></select>
+
+          <label class="dot-label" for="cardBgSelect">Card Background</label>
+          <select
+            id="cardBgSelect"
+            aria-label="Choose card background color"
+          ></select>
+
+          <label class="dot-label" for="headerColorSelect">Header Color</label>
+          <select
+            id="headerColorSelect"
+            aria-label="Choose header color"
+          ></select>
+
+          <label class="dot-label" for="textColorSelect">Text Color</label>
+          <select id="textColorSelect" aria-label="Choose text color"></select>
+        </div>
+
+        <button
+          id="saveThemeBtn"
+          style="margin-top: 20px"
+          aria-label="Save current theme customizations"
+        >
+          Save Theme
+        </button>
+      </aside>
+
+      <main class="main-content">
+        <h1>My Start Page</h1>
+
+        <form id="linkForm" role="form" aria-label="Add new bookmark">
+          <label for="linkTitle" class="sr-only">Bookmark title</label>
+          <input
+            type="text"
+            id="linkTitle"
+            placeholder="Title"
+            required
+            aria-describedby="linkTitleHelp"
+          />
+
+          <label for="linkURL" class="sr-only">Bookmark URL</label>
+          <input
+            type="url"
+            id="linkURL"
+            placeholder="https://example.com"
+            required
+            aria-describedby="linkURLHelp"
+          />
+
+          <label for="categorySelect" class="sr-only">Category</label>
+          <select id="categorySelect" required aria-describedby="categoryHelp">
+            <option value="" disabled selected>Choose category</option>
+            <option value="__custom__">+ New category...</option>
+          </select>
+
+          <label for="customCategory" class="sr-only">New category name</label>
+          <input
+            type="text"
+            id="customCategory"
+            placeholder="Enter new category"
+            aria-describedby="customCategoryHelp"
+          />
+
+          <button type="submit" aria-describedby="addButtonHelp">
+            Add Bookmark
+          </button>
+        </form>
+
+        <!-- Hidden help text for screen readers -->
+        <div class="sr-only">
+          <div id="linkTitleHelp">
+            Enter a descriptive title for your bookmark
+          </div>
+          <div id="linkURLHelp">
+            Enter the complete web address including https://
+          </div>
+          <div id="categoryHelp">
+            Choose an existing category or create a new one
+          </div>
+          <div id="customCategoryHelp">
+            Enter the name for your new category
+          </div>
+          <div id="addButtonHelp">Add this bookmark to your collection</div>
+        </div>
+
+        <!-- Search/Filter Section - Minimal and accessible -->
+        <div class="search-container" role="search">
+          <label for="searchInput" class="sr-only">Search your bookmarks</label>
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="🔍 Search your links"
+            aria-label="Search your bookmarks and categories"
+            aria-describedby="searchStats"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button
+            id="clearSearch"
+            type="button"
+            aria-label="Clear search"
+            title="Clear search (Escape key)"
+          >
+            ×
+          </button>
+        </div>
+
+        <div
+          id="searchStats"
+          class="search-stats"
+          style="display: none"
+          aria-live="polite"
+          aria-atomic="true"
+        ></div>
+
+        <div id="categoriesContainer"></div>
+      </main>
+    </div>
+
+    <footer
+      style="
+        text-align: center;
+        padding: 0.5em;
+        background: var(--card-bg);
+        color: #e0e0e0;
+      "
+    >
+      <p>© <span id="currentYear"></span> All Rights Reserved</p>
+      <p>
+        Created by
+        <a
+          href="https://mirabelledoiron.com/"
+          target="_blank"
+          style="color: var(--accent); text-decoration: none"
+          >Mirabelle</a
+        >, customized by you
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "name": "my-start-page-extension",
+  "version": "1.0.0",
+  "description": "A beautiful, customizable start page Chrome extension",
+  "main": "start.html",
+  "scripts": {
+    "start": "http-server -p 3000 -o",
+    "dev": "http-server -p 3000 -o -c-1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "keywords": ["chrome-extension", "start-page", "bookmarks"],
+  "author": "Mirabelle Doiron",
+  "license": "MIT"
+}
