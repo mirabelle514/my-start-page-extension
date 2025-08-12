@@ -960,34 +960,56 @@
         textColorSelect: "--text-color",
       };
 
-      // Simple localStorage wrapper with error handling
+      // Storage wrapper that works with both localStorage and Chrome extension storage
       const SafeStorage = {
-        setItem: (key, value) => {
+        setItem: async (key, value) => {
           try {
-            localStorage.setItem(key, value);
+            if (
+              typeof chrome !== "undefined" &&
+              chrome.storage &&
+              chrome.storage.local
+            ) {
+              await chrome.storage.local.set({ [key]: value });
+            } else {
+              localStorage.setItem(key, value);
+            }
             return true;
           } catch (e) {
             console.error("Storage error:", e);
-            showStatus(
-              "⚠️ Storage not available - data may not persist",
-              "error"
-            );
+            showStatus("Storage not available - data may not persist", "error");
             return false;
           }
         },
 
-        getItem: (key) => {
+        getItem: async (key) => {
           try {
-            return localStorage.getItem(key);
+            if (
+              typeof chrome !== "undefined" &&
+              chrome.storage &&
+              chrome.storage.local
+            ) {
+              const result = await chrome.storage.local.get([key]);
+              return result[key] || null;
+            } else {
+              return localStorage.getItem(key);
+            }
           } catch (e) {
             console.error("Storage error:", e);
             return null;
           }
         },
 
-        removeItem: (key) => {
+        removeItem: async (key) => {
           try {
-            localStorage.removeItem(key);
+            if (
+              typeof chrome !== "undefined" &&
+              chrome.storage &&
+              chrome.storage.local
+            ) {
+              await chrome.storage.local.remove([key]);
+            } else {
+              localStorage.removeItem(key);
+            }
             return true;
           } catch (e) {
             console.error("Storage error:", e);
@@ -995,23 +1017,39 @@
           }
         },
 
-        getAllData: () => {
+        getAllData: async () => {
           try {
-            const data = {};
-            for (let i = 0; i < localStorage.length; i++) {
-              const key = localStorage.key(i);
-              data[key] = localStorage.getItem(key);
+            if (
+              typeof chrome !== "undefined" &&
+              chrome.storage &&
+              chrome.storage.local
+            ) {
+              return await chrome.storage.local.get(null);
+            } else {
+              const data = {};
+              for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                data[key] = localStorage.getItem(key);
+              }
+              return data;
             }
-            return data;
           } catch (e) {
             console.error("Storage error:", e);
             return {};
           }
         },
 
-        clear: () => {
+        clear: async () => {
           try {
-            localStorage.clear();
+            if (
+              typeof chrome !== "undefined" &&
+              chrome.storage &&
+              chrome.storage.local
+            ) {
+              await chrome.storage.local.clear();
+            } else {
+              localStorage.clear();
+            }
             return true;
           } catch (e) {
             console.error("Storage error:", e);
@@ -1717,9 +1755,9 @@
         });
       });
 
-      function restoreMappings() {
+      async function restoreMappings() {
         for (const [id, varName] of Object.entries(mappings)) {
-          const val = SafeStorage.getItem(varName);
+          const val = await SafeStorage.getItem(varName);
           if (val) document.documentElement.style.setProperty(varName, val);
         }
       }
@@ -1754,9 +1792,11 @@
       let savedCategories = [];
 
       // Initialize data from storage
-      function initializeData() {
-        const linksData = SafeStorage.getItem("customLinksWithCategories");
-        const categoriesData = SafeStorage.getItem("customCategories");
+      async function initializeData() {
+        const linksData = await SafeStorage.getItem(
+          "customLinksWithCategories"
+        );
+        const categoriesData = await SafeStorage.getItem("customCategories");
 
         savedLinks = linksData ? JSON.parse(linksData) : [];
         savedCategories = categoriesData ? JSON.parse(categoriesData) : [];
@@ -2228,8 +2268,9 @@
       }
 
       // Restore sidebar state
-      function restoreSidebarState() {
-        const isCollapsed = SafeStorage.getItem("sidebarCollapsed") === "true";
+      async function restoreSidebarState() {
+        const isCollapsed =
+          (await SafeStorage.getItem("sidebarCollapsed")) === "true";
         if (isCollapsed) {
           sidebar.classList.add("collapsed");
           toggleBtn.textContent = "›";
@@ -2245,24 +2286,24 @@
       });
 
       // Initialize everything
-      function initialize() {
-        initializeData();
+      async function initialize() {
+        await initializeData();
 
         const savedTheme =
-          SafeStorage.getItem("selectedTheme") || "Elegant Midnight";
+          (await SafeStorage.getItem("selectedTheme")) || "Elegant Midnight";
 
         renderThemeSelector();
         applyTheme(savedTheme);
         highlightTheme(savedTheme);
-        restoreMappings();
-        restoreSidebarState();
+        await restoreMappings();
+        await restoreSidebarState();
         updateCategoryOptions();
         renderLinks();
         initSearch();
         initDragAndDrop();
 
         console.log(
-          "✅ Standalone Start Page loaded - data saved in localStorage"
+          "Standalone Start Page loaded - data saved in localStorage"
         );
       }
 

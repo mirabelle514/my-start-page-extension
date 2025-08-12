@@ -41,7 +41,7 @@ A beautiful, customizable start page that replaces your new tab with organized b
 Your links are as safe as your browser bookmarks - they'll persist indefinitely unless you intentionally delete them. The standalone page is actually more reliable than cloud-based solutions since it doesn't depend on external services or internet connectivity.
 **Pro tip:** Export your data periodically as a backup file for extra peace of mind.
 
-**All Original Features:**
+**All Original Features:**¬
 
 - 5 beautiful themes
 - Drag & drop link organization
