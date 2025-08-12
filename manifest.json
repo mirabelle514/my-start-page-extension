@@ -6,6 +6,12 @@
     "chrome_url_overrides": {
         "newtab": "start.html"
     },
+    "web_accessible_resources": [
+        {
+            "resources": ["recovery.html"],
+            "matches": ["<all_urls>"]
+        }
+    ],
     "permissions": [
         "storage"
     ],
