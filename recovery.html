@@ -88,7 +88,37 @@
         
         <h2>🔄 Recovery Options</h2>
         <button onclick="goToStartPage()">Go to Start Page</button>
+        <button onclick="openExtensionPage()">Open Extension Recovery</button>
         <button onclick="resetAllData()" class="danger">Reset All Data (Careful!)</button>
+        
+        <h2>📋 Manual Recovery Instructions</h2>
+        <div class="status info">
+            <h3>If the above doesn't work, try these manual steps:</h3>
+            <ol>
+                <li><strong>Chrome Extension Method:</strong>
+                    <ul>
+                        <li>Go to <code>chrome://extensions/</code></li>
+                        <li>Find "My Start Page" extension</li>
+                        <li>Click "Inspect views: service worker" or "background page"</li>
+                        <li>In the console, type: <code>chrome.storage.local.get(null, console.log)</code></li>
+                        <li>Look for "customLinksWithCategories" in the output</li>
+                    </ul>
+                </li>
+                <li><strong>Browser Storage Method:</strong>
+                    <ul>
+                        <li>Open any webpage and press F12</li>
+                        <li>Go to "Application" tab → "Local Storage"</li>
+                        <li>Look for entries starting with "customLinks"</li>
+                    </ul>
+                </li>
+                <li><strong>Extension Recovery URL:</strong>
+                    <ul>
+                        <li>Try: <code>chrome-extension://[extension-id]/recovery.html</code></li>
+                        <li>Replace [extension-id] with your actual extension ID</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
         
         <div id="results"></div>
     </div>
@@ -103,7 +133,11 @@
                 if (isExtension) {
                     await chrome.storage.local.set({ [key]: value });
                 } else {
-                    localStorage.setItem(key, value);
+                    try {
+                        localStorage.setItem(key, value);
+                    } catch (e) {
+                        console.error('localStorage not available:', e);
+                    }
                 }
             },
             getItem: async (key) => {
@@ -111,26 +145,40 @@
                     const result = await chrome.storage.local.get([key]);
                     return result[key] || null;
                 } else {
-                    return localStorage.getItem(key);
+                    try {
+                        return localStorage.getItem(key);
+                    } catch (e) {
+                        console.error('localStorage not available:', e);
+                        return null;
+                    }
                 }
             },
             getAllData: async () => {
                 if (isExtension) {
                     return await chrome.storage.local.get(null);
                 } else {
-                    const data = {};
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        data[key] = localStorage.getItem(key);
+                    try {
+                        const data = {};
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            data[key] = localStorage.getItem(key);
+                        }
+                        return data;
+                    } catch (e) {
+                        console.error('localStorage not available:', e);
+                        return {};
                     }
-                    return data;
                 }
             },
             clear: async () => {
                 if (isExtension) {
                     await chrome.storage.local.clear();
                 } else {
-                    localStorage.clear();
+                    try {
+                        localStorage.clear();
+                    } catch (e) {
+                        console.error('localStorage not available:', e);
+                    }
                 }
             }
         };
@@ -143,7 +191,10 @@
                 statusDiv.textContent = '✅ Running as Chrome Extension - Full storage access available';
             } else {
                 statusDiv.className = 'status error';
-                statusDiv.textContent = '⚠️ Not running as extension - Limited to localStorage only';
+                statusDiv.innerHTML = `
+                    ⚠️ Not running as extension - Limited access<br>
+                    <small>To access your extension data, you need to open this page through the Chrome extension.</small>
+                `;
             }
             
             // Auto-check data on load
@@ -285,7 +336,24 @@
                 // Open the start page
                 window.location.href = 'start.html';
             } else {
-                showResult('ℹ️ Please load start.html directly in your browser', 'info');
+                showResult('ℹ️ Please open start.html through the Chrome extension or load it directly', 'info');
+            }
+        }
+
+        function openExtensionPage() {
+            if (isExtension) {
+                // Already in extension context
+                showResult('✅ You are already in the extension context', 'success');
+            } else {
+                showResult(`
+                    📋 To access extension data:<br>
+                    1. Go to chrome://extensions/<br>
+                    2. Find "My Start Page"<br>
+                    3. Copy the Extension ID<br>
+                    4. Visit: chrome-extension://[ID]/recovery.html<br>
+                    <br>
+                    Or try opening a new tab (which should load your start page automatically)
+                `, 'info');
             }
         }
 
